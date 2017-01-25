@@ -1,0 +1,1 @@
+fast_add_example(coronaryGUI main.cpp CoronaryGUI.hpp CoronaryGUI.cpp)
