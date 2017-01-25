@@ -1,0 +1,14 @@
+fast_add_sources(
+    ConvertHU.cpp
+    ConvertHU.hpp
+    MedianFilter.cpp
+    MedianFilter.hpp
+    NormalizeVectorField.cpp
+    NormalizeVectorField.hpp
+    FrangiTDF.cpp
+    FrangiTDF.hpp
+    Hessian.cpp
+    Hessian.hpp
+    MaxTDF.cpp
+    MaxTDF.hpp
+)
