@@ -12,6 +12,8 @@ fast_add_sources(
     Importer.hpp
     ImageFileImporter.cpp
     ImageFileImporter.hpp
+    RCAALineSetImporter.cpp
+    RCAALineSetImporter.hpp
 )
 fast_add_python_interfaces(
 	ImageFileImporter.i
