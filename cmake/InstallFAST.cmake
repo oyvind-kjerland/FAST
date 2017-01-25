@@ -55,10 +55,10 @@ install(FILES ${PROJECT_BINARY_DIR}/FASTConfig.cmake
 )
 
 # Install Python wrapper
-install(TARGETS _fast
-        DESTINATION python
-)
-install(FILES
-    ${PROJECT_BINARY_DIR}/lib/fast.py
-    DESTINATION python
-)
+#install(TARGETS _fast
+#        DESTINATION python
+#)
+#install(FILES
+#    ${PROJECT_BINARY_DIR}/lib/fast.py
+#    DESTINATION python
+#)
