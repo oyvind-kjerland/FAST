@@ -15,7 +15,7 @@ option(FAST_MODULE_Visualization "Enable visualization capabilities using Qt5.
 Without this module, all visualization in FAST will be disabled." ON)
 option(FAST_MODULE_OpenIGTLink "Build module OpenIGTLink" ON)
 option(FAST_MODULE_NeuralNetwork "Build neural network module using tensorflow" OFF)
-option(FAST_MODULE_Python "Build Python wrappers" ON)
+option(FAST_MODULE_Python "Build Python wrappers" OFF)
 option(FAST_CONTINUOUS_INTEGRATION "Used for continuous integration tests" OFF)
 
 #### Set build type
@@ -48,27 +48,9 @@ foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
 endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
 
 #### Paths
-set(FAST_TEST_DATA_DIR "${PROJECT_SOURCE_DIR}/data/" CACHE PATH "Directory of test data")
-set(FAST_TEST_DATA_DIR "${FAST_TEST_DATA_DIR}/") # Add a slash to the back
-set(FAST_OPENCL_KERNEL_BINARY_PATH "${PROJECT_BINARY_DIR}/" CACHE PATH "Directory to put kernel binaries in. Default is build dir.")
-set(FAST_OPENCL_KERNEL_BINARY_PATH "${FAST_OPENCL_KERNEL_BINARY_PATH}/") # Add a slash to the back
+set(FAST_TEST_DATA_DIR "" CACHE PATH "Directory of test data. Default is ROOT/data/.")
+set(FAST_OPENCL_KERNEL_BINARY_PATH "" CACHE PATH "Directory to put kernel binaries in. Default is build dir.")
 set(FAST_SOURCE_DIR "${PROJECT_SOURCE_DIR}/source/FAST/")
-# Remove any existing "
-string(REPLACE "\"" "" FAST_OPENCL_KERNEL_BINARY_PATH ${FAST_OPENCL_KERNEL_BINARY_PATH})
-string(REPLACE "\"" "" FAST_TEST_DATA_DIR ${FAST_TEST_DATA_DIR})
-message("-- OpenCL Kernel binary path set to: ${FAST_OPENCL_KERNEL_BINARY_PATH}")
-message("-- FAST test data directory set to: \"${FAST_TEST_DATA_DIR}\"")
-
-### Create the header files Paths.hpp and TestDataPath.hpp which include all useful paths
-# TODO don't use preprocessor defines for this, use constant string or static functions
-configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/source/Paths.hpp.in
-        ${CMAKE_CURRENT_BINARY_DIR}/FAST/Paths.hpp
-)
-configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/source/TestDataPath.hpp.in
-        ${CMAKE_CURRENT_BINARY_DIR}/FAST/TestDataPath.hpp
-)
 
 #### Module path
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/ ${CMAKE_MODULE_PATH}) # For finding the custom Find modules
@@ -152,9 +134,28 @@ set(FAST_LIBRARY FAST)
 set(FAST_LIBRARY_DIRS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 # Create config file
-configure_file (
+configure_file(
         "${PROJECT_SOURCE_DIR}/source/FASTConfig.cmake.in"
         "${PROJECT_BINARY_DIR}/FASTConfig.cmake"
+)
+
+# If test data dir has been set by user, write it to config file
+if(NOT FAST_TEST_DATA_DIR STREQUAL "")
+    # Remove any existing "
+    string(REPLACE "\"" "" FAST_TEST_DATA_DIR ${FAST_TEST_DATA_DIR})
+    message("-- FAST test data directory set to: \"${FAST_TEST_DATA_DIR}\"")
+    set(CONFIG_TEST_DATA_PATH "TestDataPath = ${FAST_TEST_DATA_DIR}/")
+endif()
+if(NOT FAST_OPENCL_KERNEL_BINARY_PATH STREQUAL "")
+    # Remove any existing "
+    string(REPLACE "\"" "" FAST_OPENCL_KERNEL_BINARY_PATH ${FAST_OPENCL_KERNEL_BINARY_PATH})
+    message("-- OpenCL Kernel binary path set to: ${FAST_OPENCL_KERNEL_BINARY_PATH}")
+    set(CONFIG_KERNEL_BINARY_PATH "KernelBinaryPath = ${FAST_OPENCL_KERNEL_BINARY_PATH}/")
+endif()
+
+configure_file(
+        "${PROJECT_SOURCE_DIR}/source/fast_configuration.txt.in"
+        "${PROJECT_BINARY_DIR}/fast_configuration.txt"
 )
 
 include(cmake/ModulePython.cmake)

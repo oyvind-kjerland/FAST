@@ -116,6 +116,8 @@ static inline void trim(std::string &s) {
     rtrim(s);
 }
 
+std::string replace(std::string str, std::string find, std::string replacement);
+
 template <class T>
 static inline void hash_combine(std::size_t& seed, const T& v)
 {
@@ -126,20 +128,5 @@ static inline void hash_combine(std::size_t& seed, const T& v)
 void loadPerspectiveMatrix(float fovy, float aspect, float zNear, float zFar);
 
 } // end namespace fast
-
-// Hasher for enums
-// This is not working on windows:
-#ifndef _WIN32
-namespace std {
-    template<class E>
-	class hash {
-        using sfinae = typename std::enable_if<std::is_enum<E>::value, E>::type;
-    public:
-        size_t operator()(const E&e) const {
-            return std::hash<typename std::underlying_type<E>::type>()(e);
-        }
-    };
-};
-#endif
 
 #endif /* UTILITY_HPP_ */

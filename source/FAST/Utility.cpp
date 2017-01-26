@@ -1,7 +1,13 @@
 #include "FAST/Utility.hpp"
+#include "FAST/Config.hpp"
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <regex>
+#if defined(__APPLE__) || defined(__MACOSX)
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
 
 namespace fast {
 
@@ -83,7 +89,7 @@ void getIntensitySumFromOpenCLImage(OpenCLDevice::pointer device, cl::Image2D im
         buildOptions = "-DTYPE_INT16";
         break;
     }
-    std::string sourceFilename = std::string(FAST_SOURCE_DIR) + "/ImageSum.cl";
+    std::string sourceFilename = Config::getKernelSourcePath() + "/ImageSum.cl";
     std::string programName = sourceFilename + buildOptions;
     // Only create program if it doesn't exist for this device from before
     if(!device->hasProgram(programName))
@@ -163,7 +169,7 @@ void getMaxAndMinFromOpenCLImage(OpenCLDevice::pointer device, cl::Image2D image
         buildOptions = "-DTYPE_INT16";
         break;
     }
-    std::string sourceFilename = std::string(FAST_SOURCE_DIR) + "/ImageMinMax.cl";
+    std::string sourceFilename = Config::getKernelSourcePath() + "/ImageMinMax.cl";
     std::string programName = sourceFilename + buildOptions;
     // Only create program if it doesn't exist for this device from before
     if(!device->hasProgram(programName))
@@ -264,7 +270,13 @@ void getMaxAndMinFromOpenCLImage(OpenCLDevice::pointer device, cl::Image3D image
         buildOptions = "-DTYPE_INT16";
         break;
     }
-    std::string sourceFilename = std::string(FAST_SOURCE_DIR) + "/ImageMinMax.cl";
+    // Add fast_3d_image_writes flag if it is supported
+    if(device->isWritingTo3DTexturesSupported()) {
+        if(buildOptions.size() > 0)
+            buildOptions += " ";
+        buildOptions += "-Dfast_3d_image_writes";
+    }
+    std::string sourceFilename = Config::getKernelSourcePath() + "/ImageMinMax.cl";
     std::string programName = sourceFilename + buildOptions;
     // Only create program if it doesn't exist for this device from before
     if(!device->hasProgram(programName))
@@ -348,7 +360,7 @@ void getMaxAndMinFromOpenCLBuffer(OpenCLDevice::pointer device, cl::Buffer buffe
         buildOptions = "-DTYPE_INT16";
         break;
     }
-    std::string sourceFilename = std::string(FAST_SOURCE_DIR) + "/ImageMinMax.cl";
+    std::string sourceFilename = Config::getKernelSourcePath() + "/ImageMinMax.cl";
     std::string programName = sourceFilename + buildOptions;
     // Only create program if it doesn't exist for this device from before
     if(!device->hasProgram(programName))
@@ -524,6 +536,16 @@ std::string getCLErrorString(cl_int err) {
     }
 }
 
+std::string replace(std::string str, std::string find, std::string replacement) {
+    while(true) {
+        int pos = str.find(find);
+        if(pos == std::string::npos)
+            break;
+        str.replace(pos, find.size(), replacement);
+    }
+
+    return str;
+}
 
 std::vector<std::string> split(const std::string& input, const std::string& delimiter) {
     // passing -1 as the submatch index parameter performs splitting
