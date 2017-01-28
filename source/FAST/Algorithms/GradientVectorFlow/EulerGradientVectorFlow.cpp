@@ -54,8 +54,8 @@ void EulerGradientVectorFlow::setIterations(uint iterations) {
 }
 
 void EulerGradientVectorFlow::setMuConstant(float mu) {
-    if(mu > 0.2 || mu < 0)
-        throw Exception("The constant mu must be larger than 0 and smaller than 0.2 in EulerGradientVectorFlow.");
+    //if(mu > 0.2 || mu < 0)
+    //    throw Exception("The constant mu must be larger than 0 and smaller than 0.2 in EulerGradientVectorFlow.");
     mMu = mu;
 }
 
