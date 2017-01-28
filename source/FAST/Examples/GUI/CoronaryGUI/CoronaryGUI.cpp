@@ -4,8 +4,8 @@
 #include <QPushButton>
 #include <QSlider>
 #include <FAST/Importers/ImageFileImporter.hpp>
+#include<boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
-#include <boost/program_options.hpp>
 #include "FAST/TestDataPath.hpp"
 #include "FAST/Visualization/VolumeRenderer/VolumeRenderer.hpp"
 #include "FAST/Visualization/VolumeRenderer/OpacityTransferFunction.hpp"
@@ -22,7 +22,6 @@
 #include "FAST/Algorithms/GradientVectorFlow/EulerGradientVectorFlow.hpp"
 #include "FAST/Algorithms/CoronarySegmentation/Hessian.hpp"
 
-namespace po = boost::program_options;
 
 namespace fast {
 

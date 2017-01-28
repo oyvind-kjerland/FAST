@@ -48,6 +48,12 @@ else()
     #add_definitions("-DFAST_NO_VISUALIZATION")
 endif()
 
+## Boost
+find_package(Boost COMPONENTS system thread iostreams signals filesystem chrono program_options REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS} ${PROJECT_BINARY_DIR})
+link_directories(${Boost_LIBRARY_DIRS})
+set(LIBRARIES ${LIBRARIES} ${Boost_LIBRARIES})
+
 ## External depedencies
 include(cmake/ExternalEigen.cmake)
 include(cmake/ExternalZlib.cmake)

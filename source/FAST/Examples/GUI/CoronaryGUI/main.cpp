@@ -6,6 +6,12 @@
 #include "CoronaryGUI.hpp"
 #include <boost/program_options.hpp>
 
+#include<iostream>
+#include<stdio.h>
+#include<ctype.h>
+#include<stdlib.h>
+
+
 
 namespace po = boost::program_options;
 
@@ -13,6 +19,18 @@ using namespace fast;
 
 
 int main(int argc, char* argv[]) {
+
+
+//	int opt;
+//
+//	while ((opt = getopt(argc, argv, "abcdef")) != EOF)
+//	{
+//		switch(opt)
+//		{
+//		case
+//		}
+//	}
+
 
 	// Parse input arguments
 	po::options_description desc("Allowed options");
@@ -109,10 +127,10 @@ int main(int argc, char* argv[]) {
 		window->showReference();
 	}
 
-#ifdef FAST_CONTINUOUS_INTEGRATION
-	// This will automatically close the window after 5 seconds, used for CI testing
-    window->setTimeout(5*1000);
-#endif
+
+
+
+
 	window->start();
 
 	return 0;
