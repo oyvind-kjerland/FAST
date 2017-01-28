@@ -14,7 +14,7 @@ using namespace fast;
 MedianFilter::MedianFilter() {
     createInputPort<Image>(0);
     createOutputPort<Image>(0, OUTPUT_DEPENDS_ON_INPUT, 0);
-    createOpenCLProgram(std::string(FAST_SOURCE_DIR) + "Algorithms/CoronarySegmentation/MedianFilter.cl", "MedianFilter");
+    createOpenCLProgram(Config::getKernelSourcePath() + "Algorithms/CoronarySegmentation/MedianFilter.cl", "MedianFilter");
 
     // Initialize values
     this->kernelSize = 3;

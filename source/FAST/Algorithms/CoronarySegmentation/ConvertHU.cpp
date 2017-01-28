@@ -14,7 +14,7 @@ using namespace fast;
 ConvertHU::ConvertHU() {
     createInputPort<Image>(0);
     createOutputPort<Image>(0, OUTPUT_DEPENDS_ON_INPUT, 0);
-    createOpenCLProgram(std::string(FAST_SOURCE_DIR) + "Algorithms/CoronarySegmentation/ConvertHU.cl", "ConvertHU");
+    createOpenCLProgram(Config::getKernelSourcePath() + "Algorithms/CoronarySegmentation/ConvertHU.cl", "ConvertHU");
     maxHU = 500;
     minHU = 0;
 }

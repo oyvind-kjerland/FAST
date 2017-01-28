@@ -15,7 +15,7 @@ Hessian::Hessian() {
 	createOutputPort<Image>(1, OUTPUT_DEPENDS_ON_INPUT, 0);
 
 	// Create OpenCL program
-    createOpenCLProgram(std::string(FAST_SOURCE_DIR) + "Algorithms/CoronarySegmentation/Hessian.cl");
+    createOpenCLProgram(Config::getKernelSourcePath() + "Algorithms/CoronarySegmentation/Hessian.cl");
 }
 
 void Hessian::execute() {
