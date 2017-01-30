@@ -23,6 +23,8 @@
 #include "FAST/Algorithms/CoronarySegmentation/Hessian.hpp"
 
 
+#include "FAST/Utility.hpp"
+
 namespace fast {
 
 CoronaryGUI::CoronaryGUI() {
@@ -46,10 +48,10 @@ void CoronaryGUI::createLineSetImporters(std::string datasetPath, Vector3f spaci
 	line2Importer->setSpacing(spacing);
 	line3Importer->setSpacing(spacing);
 
-	line0Importer->setFilename(std::string(FAST_TEST_DATA_DIR) + datasetPath + "/vessel0/reference.txt");
-	line1Importer->setFilename(std::string(FAST_TEST_DATA_DIR) + datasetPath + "/vessel1/reference.txt");
-	line2Importer->setFilename(std::string(FAST_TEST_DATA_DIR) + datasetPath + "/vessel2/reference.txt");
-	line3Importer->setFilename(std::string(FAST_TEST_DATA_DIR) + datasetPath + "/vessel3/reference.txt");
+	line0Importer->setFilename(Config::getTestDataPath() + datasetPath + "/vessel0/reference.txt");
+	line1Importer->setFilename(Config::getTestDataPath() + datasetPath + "/vessel1/reference.txt");
+	line2Importer->setFilename(Config::getTestDataPath() + datasetPath + "/vessel2/reference.txt");
+	line3Importer->setFilename(Config::getTestDataPath() + datasetPath + "/vessel3/reference.txt");
 
 	lineRenderer = LineRenderer::New();
 	
@@ -89,7 +91,7 @@ void CoronaryGUI::updateSliceZ(int value) {
 void CoronaryGUI::setDataset(std::string dataset)
 {
 	currentDataset = dataset;
-	folderPath = std::string(FAST_TEST_DATA_DIR) + "dataset" + currentDataset + "/";
+	folderPath = Config::getTestDataPath() + "dataset" + currentDataset + "/";
 }
 
 void CoronaryGUI::showSlices()
@@ -102,7 +104,7 @@ void CoronaryGUI::showSlices()
 void CoronaryGUI::showReference()
 {
 	// Need the input dataset to obtain spacing
-	std::string filename = std::string(FAST_TEST_DATA_DIR) + "dataset" + currentDataset + "/image" + currentDataset + ".mhd";
+	std::string filename = Config::getTestDataPath() + "dataset" + currentDataset + "/image" + currentDataset + ".mhd";
 	ImageFileImporter::pointer tmpImageImporter = ImageFileImporter::New();
 	tmpImageImporter->setFilename(filename);
 	tmpImageImporter->update();
@@ -118,13 +120,11 @@ void CoronaryGUI::disableCache()
 
 void CoronaryGUI::visualizeImage(std::string filename)
 {
-	std::string path = std::string(FAST_TEST_DATA_DIR) + "dataset" + currentDataset + "/" + filename;
+	std::string path = Config::getTestDataPath() + "dataset" + currentDataset + "/" + filename;
 	importImage(path);
 	
 	
 	Image::pointer image = imageFileImporter->getOutputData<Image>();
-
-
 
 	
 	slicePort = imageFileImporter->getOutputPort();
@@ -276,7 +276,7 @@ void CoronaryGUI::performMedianFilter()
 	
 	std::cout << "Perform Median Filter" << std::endl;
 
-	std::string filename = std::string(FAST_TEST_DATA_DIR) + "dataset" + currentDataset + "/image" + currentDataset + ".mhd";
+	std::string filename = Config::getTestDataPath() + "dataset" + currentDataset + "/image" + currentDataset + ".mhd";
 	importImage(filename);
 
 	// Convert to float
@@ -289,7 +289,7 @@ void CoronaryGUI::performMedianFilter()
 
 	// Cache data
 	if (useCache) {
-		metaImageExporter->setFilename(std::string(FAST_TEST_DATA_DIR) + "dataset" + currentDataset + "/median.mhd");
+		metaImageExporter->setFilename(Config::getTestDataPath() + "dataset" + currentDataset + "/median.mhd");
 		metaImageExporter->setInputConnection(medianFilter->getOutputPort());
 		metaImageExporter->update();
 	}
@@ -304,7 +304,7 @@ void CoronaryGUI::performImageGradient()
 	std::cout << "Perform Image Gradient" << std::endl;
 
 	// Import median
-	std::string filename = std::string(FAST_TEST_DATA_DIR) + "dataset" + currentDataset + "/median.mhd";
+	std::string filename = Config::getTestDataPath() + "dataset" + currentDataset + "/median.mhd";
 	importImage(filename);
 
 	ImageGradient::pointer imageGradient = ImageGradient::New();
@@ -314,7 +314,7 @@ void CoronaryGUI::performImageGradient()
 	// Cache data
 	if (useCache) {
 		std::cout << "Start caching" << std::endl;
-		metaImageExporter->setFilename(std::string(FAST_TEST_DATA_DIR) + "dataset" + currentDataset + "/imageGradient.mhd");
+		metaImageExporter->setFilename(Config::getTestDataPath() + "dataset" + currentDataset + "/imageGradient.mhd");
 		metaImageExporter->setInputConnection(imageGradient->getOutputPort());
 		metaImageExporter->update();
 	}
@@ -330,7 +330,7 @@ void CoronaryGUI::performGradientVectorFlow()
 	std::cout << "Perform Gradient Vector Flow" << std::endl;
 
 	// Import Image
-	std::string filename = std::string(FAST_TEST_DATA_DIR) + "dataset" + currentDataset + "/imageGradient.mhd";
+	std::string filename = Config::getTestDataPath() + "dataset" + currentDataset + "/imageGradient.mhd";
 	std::cout << filename << std::endl;
 	importImage(filename);
 
@@ -347,7 +347,7 @@ void CoronaryGUI::performGradientVectorFlow()
 	// Cache data
 	if (useCache) {
 		std::cout << "start caching" << std::endl;
-		metaImageExporter->setFilename(std::string(FAST_TEST_DATA_DIR) + "dataset" + currentDataset + "/gradientVectorFlow.mhd");
+		metaImageExporter->setFilename(Config::getTestDataPath() + "dataset" + currentDataset + "/gradientVectorFlow.mhd");
 		metaImageExporter->setInputConnection(gradientVectorFlow->getOutputPort());
 		std::cout << "meta" << std::endl;
 		metaImageExporter->update();
