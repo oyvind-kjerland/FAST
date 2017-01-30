@@ -340,11 +340,8 @@ void CoronaryGUI::performGradientVectorFlow()
 	// Gradient vector flow
 	EulerGradientVectorFlow::pointer gradientVectorFlow = EulerGradientVectorFlow::New();
 	gradientVectorFlow->setInputConnection(imageFileImporter->getOutputPort());
-	std::cout << "what went wrong?" << std::endl;
 	gradientVectorFlow->setIterations(500);
-	std::cout << "what went wrong?" << std::endl;
 	gradientVectorFlow->setMuConstant(5);
-	std::cout << "what went wrong?" << std::endl;
 
 
 	// Cache data
