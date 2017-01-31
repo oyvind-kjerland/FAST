@@ -20,7 +20,7 @@ __kernel void NormalizeVectorField(
 __kernel void NormalizeVectorFieldMax(
 		__read_only image3d_t input,
 		__global float* output,
-		__global float maxLength
+		float maxLength
 	) {
 	
 	float3 vec, normalized;
@@ -37,5 +37,6 @@ __kernel void NormalizeVectorFieldMax(
 	} else {
 		normalized = vec / maxLength;
 	}
-		
+	
+	vstore3(normalized, LPOS(pos), output);	
 }

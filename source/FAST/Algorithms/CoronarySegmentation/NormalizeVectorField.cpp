@@ -8,6 +8,8 @@ NormalizeVectorField::NormalizeVectorField() {
     createOutputPort<Image>(0, OUTPUT_DEPENDS_ON_INPUT, 0);
     createOpenCLProgram(Config::getKernelSourcePath() + "Algorithms/CoronarySegmentation/NormalizeVectorField.cl");
 
+    useMaxLength = false;
+
 }
 
 void NormalizeVectorField::execute() {
