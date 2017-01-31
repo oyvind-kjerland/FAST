@@ -6,9 +6,9 @@ __constant sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_T
 __kernel void FrangiTDF3D(
         __read_only image3d_t inputEigenvalues,
         __global float* output,
-		__global float a,
-		__global float b,
-		__global float c
+		float a,
+		float b,
+		float c
     ) {
     const int4 pos = {get_global_id(0), get_global_id(1), get_global_id(2), 0};
 	
@@ -26,7 +26,16 @@ __kernel void FrangiTDF3D(
 	if (h2 > 0 || h3 > 0) {
 		t = 0;
 	} else {
+		a = 0.5;
+		b = 0.5;
+		c = 100;
 		t = (1 - exp(-Ra*Ra/(2*a*a))) * exp(-Rb*Rb/(2*b*b)) * (1 - exp(-S*S/(2*c*c)));
+	}
+	
+	if (t == t) {
+
+	} else {
+		t = 0;
 	}
 
 	output[LPOS(pos)] = t;

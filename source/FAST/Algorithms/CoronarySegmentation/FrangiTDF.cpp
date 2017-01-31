@@ -1,5 +1,7 @@
 #include "FAST/Algorithms/CoronarySegmentation/FrangiTDF.hpp"
+#include "FAST/Exception.hpp"
 #include "FAST/DeviceManager.hpp"
+#include "FAST/Data/Image.hpp"
 
 namespace fast {
 
@@ -11,12 +13,16 @@ FrangiTDF::FrangiTDF() {
 }
 
 void FrangiTDF::execute() {
+	std::cout << "Execute FrangiTDF" << std::endl;
     Image::pointer input = getStaticInputData<Image>(0);
-    Image::pointer output = getStaticOutputData<Image>(0);
+    //Image::pointer output = getStaticOutputData<Image>(0);
+
+
 
     std::string buildOptions = "";
     DataType type = TYPE_FLOAT;
 
+    Image::pointer output = Image::New();
     output->create(
 			input->getWidth(),
 			input->getHeight(),
@@ -48,7 +54,14 @@ void FrangiTDF::execute() {
                 cl::NDRange(input->getWidth(), input->getHeight(), input->getDepth()),
                 cl::NullRange
         );
+        device->getCommandQueue().finish();
     }
+
+
+
+    setStaticOutputData<Image>(0, output);
+
+    std::cout << "Finish Execute FrangiTDF" << std::endl;
 }
 
 void FrangiTDF::setTubeConstants(float alpha, float beta, float gamma) {
