@@ -123,8 +123,9 @@ void CoronaryGUI::visualizeImage(std::string filename)
 	std::string path = Config::getTestDataPath() + "dataset" + currentDataset + "/" + filename;
 	importImage(path);
 	
-	
 	Image::pointer image = imageFileImporter->getOutputData<Image>();
+
+
 
 	
 	slicePort = imageFileImporter->getOutputPort();
@@ -148,7 +149,12 @@ void CoronaryGUI::initView()
 	float max = image->calculateMaximumIntensity();
 	float min = image->calculateMinimumIntensity();
 
+
+	std::cout << "max intensity: " << max << ", min intenisty: " << min << std::endl;
 	intensityWindow = max - min;
+	if (intensityWindow == 0) {
+		intensityWindow = 0.1f;
+	}
 	intensityLevel = intensityWindow / 2.0f;
 
 
@@ -310,17 +316,22 @@ void CoronaryGUI::performImageGradient()
 	ImageGradient::pointer imageGradient = ImageGradient::New();
 	imageGradient->setInputConnection(imageFileImporter->getOutputPort());
 
+	// Normalize Vector Field
+	NormalizeVectorField::pointer normalize = NormalizeVectorField::New();
+	normalize->setInputConnection(imageGradient->getOutputPort());
+	normalize->setUseMaxLength(true);
+	normalize->setMaxLength(100);
 
 	// Cache data
 	if (useCache) {
 		std::cout << "Start caching" << std::endl;
 		metaImageExporter->setFilename(Config::getTestDataPath() + "dataset" + currentDataset + "/imageGradient.mhd");
-		metaImageExporter->setInputConnection(imageGradient->getOutputPort());
+		metaImageExporter->setInputConnection(normalize->getOutputPort());
 		metaImageExporter->update();
 	}
 
 	// Visualize slices
-	slicePort = imageGradient->getOutputPort();
+	slicePort = normalize->getOutputPort();
 
 }
 
@@ -344,23 +355,26 @@ void CoronaryGUI::performGradientVectorFlow()
 	gradientVectorFlow->setMuConstant(5);
 
 
+	// Normalize vector field
+	NormalizeVectorField::pointer normalize = NormalizeVectorField::New();
+	normalize->setInputConnection(gradientVectorFlow->getOutputPort());
+	normalize->setUseMaxLength(false);
+
 	// Cache data
 	if (useCache) {
 		std::cout << "start caching" << std::endl;
 		metaImageExporter->setFilename(Config::getTestDataPath() + "dataset" + currentDataset + "/gradientVectorFlow.mhd");
-		metaImageExporter->setInputConnection(gradientVectorFlow->getOutputPort());
-		std::cout << "meta" << std::endl;
+		metaImageExporter->setInputConnection(normalize->getOutputPort());
 		metaImageExporter->update();
-		std::cout << "update" << std::endl;
 	}
 
 	// Visualize
-	slicePort = gradientVectorFlow->getOutputPort();
+	slicePort = normalize->getOutputPort();
 	
 
 }
 
-void CoronaryGUI::performHessian()
+void CoronaryGUI::performImageGradientHessian()
 {
 
 	// Import image gradient
@@ -386,14 +400,18 @@ void CoronaryGUI::performHessian()
 	if (useCache) {
 
 		// Cache eigenvalues
-		std::cout << "Cache eigenvalues" << std::endl;
+		//outputFilename = folderPath + "eigenvaluesImageGradient.mhd";
+		//metaImageExporter->setFilename(outputFilename);
+		//metaImageExporter->setInputConnection(hessian->getEigenvaluesOuptutPort());
+		//metaImageExporter->update();
+
 		outputFilename = folderPath + "eigenvaluesImageGradient.mhd";
 		metaImageExporter->setFilename(outputFilename);
 		metaImageExporter->setInputConnection(hessian->getEigenvaluesOuptutPort());
 		metaImageExporter->update();
 
+		std::cout << "saving" << std::endl;
 		// Cache tangents
-		std::cout << "Cache tangents" << std::endl;
 		outputFilename = folderPath + "tangentsImageGradient.mhd";
 		metaImageExporter->setFilename(outputFilename);
 		metaImageExporter->setInputConnection(hessian->getTangentsOutputPort());
@@ -401,41 +419,103 @@ void CoronaryGUI::performHessian()
 	}
 
 	// Visualize eigenvalues
-	slicePort = hessian->getOutputPort(0);
+	slicePort = hessian->getEigenvaluesOuptutPort();
+}
 
+void CoronaryGUI::performGradientVectorFlowHessian()
+{
 
-	//
-	// Gradient Vector Flow
-	//
+	// Import image gradient
+	std::cout << "Perform Hessian" << std::endl;
+
+	std::string inputFilename, outputFilename;
 
 	inputFilename = folderPath + "gradientVectorFlow.mhd";
 	importImage(inputFilename);
 
+
+	// Hessian analysis
+	Hessian::pointer hessian = Hessian::New();
+	hessian->setInputConnection(imageFileImporter->getOutputPort());
+
 	if (useCache) {
 
-		outputFilename = folderPath + "eigenvaluesGradientVectorFlow";
+		outputFilename = folderPath + "eigenvaluesGradientVectorFlow.mhd";
 		metaImageExporter->setFilename(outputFilename);
 		metaImageExporter->setInputConnection(hessian->getEigenvaluesOuptutPort());
 		metaImageExporter->update();
 
-		outputFilename = folderPath + "tangentsGradientVectorFlow";
+
+		outputFilename = folderPath + "tangentsGradientVectorFlow.mhd";
 		metaImageExporter->setFilename(outputFilename);
 		metaImageExporter->setInputConnection(hessian->getTangentsOutputPort());
 		metaImageExporter->update();
 	}
 
-
-	
-
+	// Visualize eigenvalues
+	slicePort = hessian->getEigenvaluesOuptutPort();
 }
+
 
 
 void CoronaryGUI::performImageGradientTDF()
 {
+
+	std::cout << "Perform Image Gradient TDF" << std::endl;
+
+	std::string inputFilename, outputFilename;
+
+	inputFilename = folderPath + "eigenvaluesImageGradient.mhd";
+	outputFilename = folderPath + "imageGradientTDF.mhd";
+
+	// Import image
+	importImage(inputFilename);
+
+	// Create TDF
+	FrangiTDF::pointer tdf = FrangiTDF::New();
+	tdf->setInputConnection(imageFileImporter->getOutputPort());
+	tdf->setTubeConstants(0.5f, 0.5f, 100.0f);
+	tdf->update();
+	slicePort = tdf->getOutputPort();
+	std::cout << "Done Perform Image Gradient TDF" << std::endl;
+	/*
+	if (useCache) {
+		metaImageExporter->setFilename(outputFilename);
+		metaImageExporter->setInputConnection(tdf->getOutputPort());
+		metaImageExporter->update();
+	}
+*/
+
+
+
 }
 
 void CoronaryGUI::performGradientVectorFlowTDF()
 {
+
+	std::cout << "Perform Gradient Vector Flow TDF" << std::endl;
+
+	std::string inputFilename, outputFilename;
+
+	inputFilename = folderPath + "eigenvaluesGradientVectorFlow.mhd";
+	outputFilename = folderPath + "gradientVectorFlowTDF.mhd";
+
+	// Import image
+	importImage(inputFilename);
+
+	// Create TDF
+	FrangiTDF::pointer tdf = FrangiTDF::New();
+	tdf->setInputConnection(imageFileImporter->getOutputPort());
+	tdf->setTubeConstants(0.5f, 0.5f, 100.0f);
+	tdf->update();
+	if (useCache) {
+		metaImageExporter->setFilename(outputFilename);
+		metaImageExporter->setInputConnection(tdf->getOutputPort());
+		metaImageExporter->update();
+	}
+
+	slicePort = tdf->getOutputPort();
+
 }
 
 void CoronaryGUI::performMaxTDF()

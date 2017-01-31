@@ -36,7 +36,8 @@ namespace fast {
 		void performMedianFilter();
 		void performImageGradient();
 		void performGradientVectorFlow();
-		void performHessian();
+		void performImageGradientHessian();
+		void performGradientVectorFlowHessian();
 		void performImageGradientTDF();
 		void performGradientVectorFlowTDF();
 		void performMaxTDF();

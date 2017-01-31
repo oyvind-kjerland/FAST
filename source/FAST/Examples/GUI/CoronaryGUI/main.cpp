@@ -58,10 +58,11 @@ int main(int argc, char* argv[]) {
 		("gradient-vector-flow", "perform gradient vector flow")
 
 		// Tube detection filter
-		("hessian", "perform Hessian analysis to obtain the tangents and the eigenvalues")
+		("image-gradient-hessian", "perform Hessian analysis on image gradients to obtain the tangents and the eigenvalues")
+		("gradient-vector-flow-hessian", "perform Hessian analysis on gradient vector flow to obtain the tangents and the eigenvalues")
 		("image-gradient-tdf","perform Frangi tube detection filter on the image gradient")
 		("gradient-vector-flow-tdf", "perform Frangi tube detection filter on the gradient vector flow")
-		("maxtdf", "perform MaxTDF, taking the maximum of the TDF applied to the original image gradient and the gradient vector flow result")
+		("max-tdf", "perform MaxTDF, taking the maximum of the TDF applied to the original image gradient and the gradient vector flow result")
 		
 		// Centerline extraction
 		("ridge-traversal", "perform ridge traversal")
@@ -114,8 +115,31 @@ int main(int argc, char* argv[]) {
 		window->performGradientVectorFlow();
 	}
 
-	if (vm.count("hessian")) {
-		window->performHessian();
+	if (vm.count("image-gradient-hessian")) {
+		window->performImageGradientHessian();
+	}
+
+	if (vm.count("gradient-vector-flow-hessian")) {
+		window->performGradientVectorFlowHessian();
+	}
+	if (vm.count("image-gradient-tdf")) {
+		window->performImageGradientTDF();
+	}
+
+	if (vm.count("gradient-vector-flow-tdf")) {
+		window->performGradientVectorFlowTDF();
+	}
+
+	if (vm.count("max-tdf")) {
+		window->performMaxTDF();
+	}
+
+	if (vm.count("ridge-traversal")) {
+		window->performRidgeTraversal();
+	}
+
+	if (vm.count("tree-reconstruction")) {
+		window->performTreeReconstruction();
 	}
 
 	//if (vm.count("show-slices")) {
