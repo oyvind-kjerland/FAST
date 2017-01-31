@@ -265,7 +265,20 @@ __kernel void Hessian(
     float eigenVectors[3][3];
     eigen_decomposition(Hessian, eigenVectors, eigenValues);
     
-	const float3 h = {eigenValues[0], eigenValues[1], eigenValues[2]};
+    float3 ht;
+//	const float3 h = {eigenValues[0], eigenValues[1], eigenValues[2]};
+	if (eigenValues[0] == eigenValues[0] && eigenValues[1] == eigenValues[1] && eigenValues[2] == eigenValues[2]) {
+//		const float3 h = {eigenValues[0], eigenValues[1], eigenValues[2]};
+		ht.x = eigenValues[0];
+		ht.y = eigenValues[1];
+		ht.z = eigenValues[2];
+	} else {
+		ht.x = 0;
+		ht.y = 0;
+		ht.z = 0;
+	}
+
+	const float3 h = (ht);
 	const float3 t = {eigenVectors[0][0], eigenVectors[0][1], eigenVectors[0][2]};
 
 	vstore3(h.xyz, LPOS(pos), outputEigenValues);

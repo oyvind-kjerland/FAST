@@ -65,6 +65,9 @@ void Hessian::execute() {
                 cl::NDRange(input->getWidth(), input->getHeight(), input->getDepth()),
                 cl::NullRange
         );
+        device->getCommandQueue().finish();
+
+
     }
 }
 
