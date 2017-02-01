@@ -9,7 +9,8 @@ namespace fast {
 class MaxTDF : public ProcessObject {
     FAST_OBJECT(MaxTDF);
     public:
-
+    	void setTDFInputConnection(int index, ProcessObjectPort port);
+    	void setTangentsInputConnection(int index, ProcessObjectPort port);
     private:
         MaxTDF();
         void execute();
