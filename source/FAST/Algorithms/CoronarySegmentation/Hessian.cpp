@@ -67,7 +67,6 @@ void Hessian::execute() {
         );
         device->getCommandQueue().finish();
 
-
     }
 }
 
