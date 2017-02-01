@@ -20,7 +20,4 @@ __kernel void MaxTDF(
 		output[LPOS(pos)] = v2;
 	}
 
-	output[LPOS(pos)] = (v1 > v2) ? v1 : v2;
-
-	vstore3(vec, LPOS(pos), output);
 }

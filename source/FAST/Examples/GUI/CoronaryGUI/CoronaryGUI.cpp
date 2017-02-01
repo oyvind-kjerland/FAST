@@ -21,6 +21,7 @@
 #include "FAST/Algorithms/CoronarySegmentation/FrangiTDF.hpp"
 #include "FAST/Algorithms/GradientVectorFlow/EulerGradientVectorFlow.hpp"
 #include "FAST/Algorithms/CoronarySegmentation/Hessian.hpp"
+#include "FAST/Algorithms/CoronarySegmentation/MaxTDF.hpp"
 
 
 #include "FAST/Utility.hpp"
@@ -125,13 +126,7 @@ void CoronaryGUI::visualizeImage(std::string filename)
 	
 	Image::pointer image = imageFileImporter->getOutputData<Image>();
 
-
-
-	
 	slicePort = imageFileImporter->getOutputPort();
-
-
-
 
 }
 
@@ -273,7 +268,6 @@ void CoronaryGUI::importImage(std::string filename)
 	sliceWidth = importedImage->getWidth();
 	sliceHeight = importedImage->getHeight();
 	sliceDepth = importedImage->getDepth();
-
 
 }
 
@@ -456,8 +450,6 @@ void CoronaryGUI::performGradientVectorFlowHessian()
 	slicePort = hessian->getEigenvaluesOuptutPort();
 }
 
-
-
 void CoronaryGUI::performImageGradientTDF()
 {
 
@@ -520,6 +512,33 @@ void CoronaryGUI::performGradientVectorFlowTDF()
 
 void CoronaryGUI::performMaxTDF()
 {
+	std::cout << "Perform Max TDF" << std::endl;
+
+	std::string inputFilename, outputFilename;
+
+	// Import imageGradientTDF
+	ImageFileImporter::pointer imageGradientTDF = ImageFileImporter::New();
+	imageGradientTDF->setFilename(folderPath + "eigenvaluesImageGradient.mhd");
+
+
+	ImageFileImporter::pointer gradientVectorFlowTDF = ImageFileImporter::New();
+	gradientVectorFlowTDF->setFilename(folderPath +  "eigenvaluesGradientVectorFlow.mhd");
+
+
+	MaxTDF::pointer maxTDF = MaxTDF::New();
+	maxTDF->setInputConnection(0, imageGradientTDF->getOutputPort());
+	maxTDF->setInputConnection(1, gradientVectorFlowTDF->getOutputPort());
+
+
+	slicePort = maxTDF->getOutputPort();
+
+	if (useCache) {
+		outputFilename = folderPath + "maxTDF.mhd";
+		metaImageExporter->setFilename(outputFilename);
+		metaImageExporter->setInputConnection(maxTDF->getOutputPort());
+		metaImageExporter->update();
+	}
+
 }
 
 void CoronaryGUI::performRidgeTraversal()

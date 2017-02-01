@@ -21,16 +21,6 @@ using namespace fast;
 int main(int argc, char* argv[]) {
 
 
-//	int opt;
-//
-//	while ((opt = getopt(argc, argv, "abcdef")) != EOF)
-//	{
-//		switch(opt)
-//		{
-//		case
-//		}
-//	}
-
 
 	// Parse input arguments
 	po::options_description desc("Allowed options");

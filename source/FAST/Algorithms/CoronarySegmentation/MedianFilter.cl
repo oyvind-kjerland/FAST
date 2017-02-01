@@ -12,7 +12,7 @@ __kernel void medianFilter_5x5x5(
 	//const int4 pos = {get_global_id(0), get_global_id(1), get_global_id(2), 0};
 	const int4 pos = {get_global_id(0), get_global_id(1), d, 0};
 	
-	float cube[125];
+	__private float cube[125];
 	
 
 	
