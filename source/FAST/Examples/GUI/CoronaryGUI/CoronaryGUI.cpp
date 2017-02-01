@@ -23,6 +23,7 @@
 #include "FAST/Algorithms/CoronarySegmentation/Hessian.hpp"
 #include "FAST/Algorithms/CoronarySegmentation/MaxTDF.hpp"
 
+#include "FAST/Algorithms/BinaryThresholding/BinaryThresholding.hpp"
 
 #include "FAST/Utility.hpp"
 
@@ -470,16 +471,12 @@ void CoronaryGUI::performImageGradientTDF()
 	tdf->update();
 	slicePort = tdf->getOutputPort();
 	std::cout << "Done Perform Image Gradient TDF" << std::endl;
-	/*
+
 	if (useCache) {
 		metaImageExporter->setFilename(outputFilename);
 		metaImageExporter->setInputConnection(tdf->getOutputPort());
 		metaImageExporter->update();
 	}
-*/
-
-
-
 }
 
 void CoronaryGUI::performGradientVectorFlowTDF()
@@ -518,26 +515,73 @@ void CoronaryGUI::performMaxTDF()
 
 	// Import imageGradientTDF
 	ImageFileImporter::pointer imageGradientTDF = ImageFileImporter::New();
-	imageGradientTDF->setFilename(folderPath + "eigenvaluesImageGradient.mhd");
+	imageGradientTDF->setFilename(folderPath + "imageGradientTDF.mhd");
 
-
+	// Import gradientVectorFlowTDF
 	ImageFileImporter::pointer gradientVectorFlowTDF = ImageFileImporter::New();
-	gradientVectorFlowTDF->setFilename(folderPath +  "eigenvaluesGradientVectorFlow.mhd");
+	gradientVectorFlowTDF->setFilename(folderPath +  "gradientVectorFlowTDF.mhd");
 
+	// Import tangents
+	ImageFileImporter::pointer imageGradientTangents = ImageFileImporter::New();
+	imageGradientTangents->setFilename(folderPath + "tangentsImageGradient.mhd");
+
+	ImageFileImporter::pointer gradientVectorFlowTangents = ImageFileImporter::New();
+	gradientVectorFlowTangents->setFilename(folderPath + "tangentsGradientVectorFlow.mhd");
 
 	MaxTDF::pointer maxTDF = MaxTDF::New();
-	maxTDF->setInputConnection(0, imageGradientTDF->getOutputPort());
-	maxTDF->setInputConnection(1, gradientVectorFlowTDF->getOutputPort());
-
+	maxTDF->setTDFInputConnection(0, imageGradientTDF->getOutputPort());
+	maxTDF->setTDFInputConnection(1, gradientVectorFlowTDF->getOutputPort());
+	maxTDF->setTangentsInputConnection(0, imageGradientTangents->getOutputPort());
+	maxTDF->setTangentsInputConnection(1, gradientVectorFlowTangents->getOutputPort());
 
 	slicePort = maxTDF->getOutputPort();
 
 	if (useCache) {
 		outputFilename = folderPath + "maxTDF.mhd";
 		metaImageExporter->setFilename(outputFilename);
-		metaImageExporter->setInputConnection(maxTDF->getOutputPort());
+		metaImageExporter->setInputConnection(maxTDF->getOutputPort(0));
+		try {
+			metaImageExporter->update();
+		} catch (cl::Error& e) {
+			std::cout << "here" << std::endl;
+			std::cout << e.err() << std::endl;
+		}
+
+
+		// Save tangents
+		outputFilename = folderPath + "maxTangents.mhd";
+		metaImageExporter->setFilename(outputFilename);
+		metaImageExporter->setInputConnection(maxTDF->getOutputPort(1));
 		metaImageExporter->update();
 	}
+
+}
+
+void CoronaryGUI::performLungTissueRemoval() {
+	// Import median
+	std::cout << "Perform Lung tissue removal" << std::endl;
+
+	std::string medianFilename = folderPath + "median.mhd";
+	std::string inputFilename = folderPath + "maxTDF.mhd";
+
+	std::string outputFilename = folderPath + "lungTDF.mhd";
+
+	ImageFileImporter::pointer median = ImageFileImporter::New();
+	median->setFilename(medianFilename);
+	median->update();
+
+	ImageFileImporter::pointer input =  ImageFileImporter::New();
+	input->setFilename(inputFilename);
+
+
+	// Perform Binary thresholding
+	BinaryThresholding::pointer binaryThresholding = BinaryThresholding::New();
+	binaryThresholding->setInputConnection(median->getOutputPort());
+	binaryThresholding->setLowerThreshold(324);
+
+	slicePort = binaryThresholding->getOutputPort();
+
+
 
 }
 

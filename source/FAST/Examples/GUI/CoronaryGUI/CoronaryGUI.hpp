@@ -44,7 +44,7 @@ namespace fast {
 		void performRidgeTraversal();
 		void performTreeReconstruction();
 		void performOstiumDetection();
-
+		void performLungTissueRemoval();
 
 	private:
 		CoronaryGUI();

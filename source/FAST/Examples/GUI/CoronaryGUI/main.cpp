@@ -132,6 +132,10 @@ int main(int argc, char* argv[]) {
 		window->performTreeReconstruction();
 	}
 
+	if (vm.count("lung-tissue-removal")) {
+		window->performLungTissueRemoval();
+	}
+
 	//if (vm.count("show-slices")) {
 	window->showSlices();
 	//}
