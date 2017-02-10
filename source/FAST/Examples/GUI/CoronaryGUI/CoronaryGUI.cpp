@@ -22,6 +22,8 @@
 #include "FAST/Algorithms/GradientVectorFlow/EulerGradientVectorFlow.hpp"
 #include "FAST/Algorithms/CoronarySegmentation/Hessian.hpp"
 #include "FAST/Algorithms/CoronarySegmentation/MaxTDF.hpp"
+#include "FAST/Algorithms/CoronarySegmentation/RidgeCandidateSelection.hpp"
+
 
 #include "FAST/Algorithms/BinaryThresholding/BinaryThresholding.hpp"
 
@@ -583,6 +585,27 @@ void CoronaryGUI::performLungTissueRemoval() {
 
 
 
+}
+
+void CoronaryGUI::performRidgeCandidateSelection() {
+
+	std::cout << "Perform Ridge Candidate Selection" << std::endl;
+
+	std::string inputFilename = folderPath + "maxTDF.mhd";
+	std::string outputfilename = folderPath + "ridgeCandidates.mhd";
+
+	importImage(inputFilename);
+
+	std::cout << "Before" << std::endl;
+	RidgeCandidateSelection::pointer ridgeCandidateSelection = RidgeCandidateSelection::New();
+	std::cout << "after" << std::endl;
+	ridgeCandidateSelection->setTHigh(0.5f);
+	ridgeCandidateSelection->setTLow(0.1f);
+	ridgeCandidateSelection->setInputConnection(imageFileImporter->getOutputPort());
+	std::cout << "Before update" << std::endl;
+	ridgeCandidateSelection->update();
+	std::cout << "After update" << std::endl;
+	slicePort = ridgeCandidateSelection->getCandidatesOuptutPort();
 }
 
 void CoronaryGUI::performRidgeTraversal()

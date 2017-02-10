@@ -11,4 +11,6 @@ fast_add_sources(
     Hessian.hpp
     MaxTDF.cpp
     MaxTDF.hpp
+    RidgeCandidateSelection.cpp
+    RidgeCandidateSelection.hpp
 )
