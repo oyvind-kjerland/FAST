@@ -55,6 +55,7 @@ int main(int argc, char* argv[]) {
 		("max-tdf", "perform MaxTDF, taking the maximum of the TDF applied to the original image gradient and the gradient vector flow result")
 		
 		// Centerline extraction
+		("ridge-candidate-selection", "perform ridge candidate selection")
 		("ridge-traversal", "perform ridge traversal")
 		("tree-reconstruction", "perform tree reconstruction")
 	;
@@ -124,6 +125,10 @@ int main(int argc, char* argv[]) {
 		window->performMaxTDF();
 	}
 
+	if (vm.count("ridge-candidate-selection")) {
+		window->performRidgeCandidateSelection();
+	}
+
 	if (vm.count("ridge-traversal")) {
 		window->performRidgeTraversal();
 	}
@@ -135,6 +140,8 @@ int main(int argc, char* argv[]) {
 	if (vm.count("lung-tissue-removal")) {
 		window->performLungTissueRemoval();
 	}
+
+
 
 	//if (vm.count("show-slices")) {
 	window->showSlices();

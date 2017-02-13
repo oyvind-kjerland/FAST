@@ -41,10 +41,16 @@ namespace fast {
 		void performImageGradientTDF();
 		void performGradientVectorFlowTDF();
 		void performMaxTDF();
+
+
+		void performRidgeCandidateSelection();
 		void performRidgeTraversal();
 		void performTreeReconstruction();
+
 		void performOstiumDetection();
 		void performLungTissueRemoval();
+
+
 
 	private:
 		CoronaryGUI();
