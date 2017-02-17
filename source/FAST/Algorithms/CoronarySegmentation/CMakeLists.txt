@@ -13,4 +13,6 @@ fast_add_sources(
     MaxTDF.hpp
     RidgeCandidateSelection.cpp
     RidgeCandidateSelection.hpp
+    RidgeTraversal.cpp
+    RidgeTraversal.hpp
 )

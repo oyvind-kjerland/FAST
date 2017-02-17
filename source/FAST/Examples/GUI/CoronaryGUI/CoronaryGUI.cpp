@@ -23,7 +23,7 @@
 #include "FAST/Algorithms/CoronarySegmentation/Hessian.hpp"
 #include "FAST/Algorithms/CoronarySegmentation/MaxTDF.hpp"
 #include "FAST/Algorithms/CoronarySegmentation/RidgeCandidateSelection.hpp"
-
+#include "FAST/Algorithms/CoronarySegmentation/RidgeTraversal.hpp"
 
 #include "FAST/Algorithms/BinaryThresholding/BinaryThresholding.hpp"
 
@@ -592,7 +592,7 @@ void CoronaryGUI::performRidgeCandidateSelection() {
 	std::cout << "Perform Ridge Candidate Selection" << std::endl;
 
 	std::string inputFilename = folderPath + "maxTDF.mhd";
-	std::string outputfilename = folderPath + "ridgeCandidates.mhd";
+	std::string outputFilename = folderPath + "ridgeCandidates.mhd";
 
 	importImage(inputFilename);
 
@@ -606,10 +606,49 @@ void CoronaryGUI::performRidgeCandidateSelection() {
 	ridgeCandidateSelection->update();
 	std::cout << "After update" << std::endl;
 	slicePort = ridgeCandidateSelection->getCandidatesOuptutPort();
+
+	if (useCache) {
+		metaImageExporter->setFilename(outputFilename);
+		metaImageExporter->setInputConnection(ridgeCandidateSelection->getCandidatesOuptutPort());
+		metaImageExporter->update();
+	}
 }
 
 void CoronaryGUI::performRidgeTraversal()
 {
+	std::cout << "Perform Ridge Traversal" << std::endl;
+
+	std::string tdfFilename = folderPath + "maxTDF.mhd";
+	std::string tangentsFilename = folderPath + "maxTangents.mhd";
+	std::string ridgeCandidatesFilename = folderPath + "ridgeCandidates.mhd";
+
+
+	// Create image file importers
+	ImageFileImporter::pointer tdf = ImageFileImporter::New();
+	ImageFileImporter::pointer tangents = ImageFileImporter::New();
+	ImageFileImporter::pointer ridgeCandidates = ImageFileImporter::New();
+
+	tdf->setFilename(tdfFilename);
+	tangents->setFilename(tangentsFilename);
+	ridgeCandidates->setFilename(ridgeCandidatesFilename);
+
+
+	// Create RidgeTraversal
+	RidgeTraversal::pointer ridgeTraversal = RidgeTraversal::New();
+	ridgeTraversal->setTDFInputConnection(tdf->getOutputPort());
+	ridgeTraversal->setTangentsInputConnection(tangents->getOutputPort());
+	ridgeTraversal->setRidgeCandidatesInputConnection(ridgeCandidates->getOutputPort());
+	ridgeTraversal->setTLow(0.2f);
+
+	ridgeTraversal->update();
+	slicePort = ridgeTraversal->getNeighborsOutputPort();
+
+
+
+
+
+
+
 }
 
 void CoronaryGUI::performTreeReconstruction()
