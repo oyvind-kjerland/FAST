@@ -15,7 +15,7 @@ class RidgeTraversal : public ProcessObject {
     public:
 
     	void setTLow(float t_low);
-
+    	void setLMin(int l_min);
     	void setTDFInputConnection(ProcessObjectPort port);
     	void setTangentsInputConnection(ProcessObjectPort port);
     	void setRidgeCandidatesInputConnection(ProcessObjectPort port);
@@ -25,6 +25,7 @@ class RidgeTraversal : public ProcessObject {
         RidgeTraversal();
         void execute();
         float t_low;
+        int l_min;
 };
 
 }

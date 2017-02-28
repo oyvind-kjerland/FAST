@@ -638,15 +638,11 @@ void CoronaryGUI::performRidgeTraversal()
 	ridgeTraversal->setTDFInputConnection(tdf->getOutputPort());
 	ridgeTraversal->setTangentsInputConnection(tangents->getOutputPort());
 	ridgeTraversal->setRidgeCandidatesInputConnection(ridgeCandidates->getOutputPort());
-	ridgeTraversal->setTLow(0.2f);
+	ridgeTraversal->setTLow(0.1f);
+	ridgeTraversal->setLMin(10);
 
 	ridgeTraversal->update();
 	slicePort = ridgeTraversal->getNeighborsOutputPort();
-
-
-
-
-
 
 
 }
