@@ -24,6 +24,7 @@
 #include "FAST/Algorithms/CoronarySegmentation/MaxTDF.hpp"
 #include "FAST/Algorithms/CoronarySegmentation/RidgeCandidateSelection.hpp"
 #include "FAST/Algorithms/CoronarySegmentation/RidgeTraversal.hpp"
+#include "FAST/Algorithms/CoronarySegmentation/CreateTubeFromReference.hpp"
 
 #include "FAST/Algorithms/BinaryThresholding/BinaryThresholding.hpp"
 
@@ -643,6 +644,24 @@ void CoronaryGUI::performRidgeTraversal()
 
 	ridgeTraversal->update();
 	slicePort = ridgeTraversal->getNeighborsOutputPort();
+
+
+}
+
+void CoronaryGUI::createTubeFromReference() {
+	std::cout << "Create tube from reference" << std::endl;
+	std::string referenceFilename = folderPath;
+	std::string outputfilename = folderPath + "tubeFromReference.mhd";
+
+	importImage(folderPath + "image02.mhd");
+
+	CreateTubeFromReference::pointer tubeFromReference = CreateTubeFromReference::New();
+	tubeFromReference->setInputConnection(imageFileImporter->getOutputPort());
+	tubeFromReference->setFilename(referenceFilename);
+	tubeFromReference->update();
+
+	slicePort = tubeFromReference->getOutputPort();
+
 
 
 }

@@ -15,4 +15,6 @@ fast_add_sources(
     RidgeCandidateSelection.hpp
     RidgeTraversal.cpp
     RidgeTraversal.hpp
+    CreateTubeFromReference.cpp
+    CreateTubeFromReference.hpp
 )

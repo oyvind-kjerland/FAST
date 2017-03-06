@@ -2,21 +2,16 @@
 #include "FAST/Exception.hpp"
 #include "FAST/DeviceManager.hpp"
 #include "FAST/Data/Image.hpp"
+#include "FAST/Data/LineSet.hpp"
 #include <queue>
 #include <vector>
 #include <list>
 #include <stack>
 
 #define ARRAY_POS(x,y,z) z*height*width+y*width+x
-
+#define POINT_POS(n)
 namespace fast {
 
-typedef struct _ridge_neighbor{
-	float forward_pos;
-	float backward_pos;
-	float forward_direction;
-	float backward_direction;
-} ridge_neighbor;
 
 
 RidgeTraversal::RidgeTraversal() {
@@ -198,6 +193,49 @@ void RidgeTraversal::execute() {
 
     }
 
+    /*
+    // Extract lines
+  	int candidate;
+  	ridge_point rp;
+
+    for (int i=0; i<validCandidateStack.size(); i++) {
+
+    	candidate = validCandidateStack.top();
+    	validCandidateStack.pop();
+
+    	std::list<ridge_point> ridge_points;
+    	rp = createPointFromArrayPos(candidate, width, height);
+    	std::cout << "Ridge point, x: " << rp.x << " y: " << rp.y << " z: " << rp.z << std::endl;
+
+
+		// Traverse forward
+		neighbor = neighborArray[ARRAY_POS(x,y,z)];
+		same_direction = 1;
+
+		while (1) {
+
+			if (same_direction) {
+				if (neighbor.forward_pos == 0 || centerLineImageArray[(int)neighbor.forward_pos] == 1) break;
+				length++;
+				centerLineImageArray[(int)neighbor.forward_pos] = 1;
+				same_direction = neighbor.forward_direction;
+				neighbor = neighborArray[(int)neighbor.forward_pos];
+
+			} else {
+				if (neighbor.backward_pos == 0 || centerLineImageArray[(int)neighbor.backward_pos] == 1) break;
+				length++;
+				centerLineImageArray[(int)neighbor.backward_pos] = 1;
+				same_direction = neighbor.backward_direction;
+				neighbor = neighborArray[(int)neighbor.backward_pos];
+			}
+		}
+
+
+    }*/
+
+
+
+
     std::cout << "Number of candidates: " << sum_candidates << " Num valid: " << validCandidateStack.size() << std::endl;
 
 
@@ -207,6 +245,16 @@ void RidgeTraversal::execute() {
     std::cout << "Finish Execute RidgeTraversal" << std::endl;
 }
 
+
+ridge_point RidgeTraversal::createPointFromArrayPos(int arrayPos, int width, int height) {
+	ridge_point rp;
+
+	rp.x = arrayPos % width;
+	rp.y = (arrayPos % (width*height)) / width;
+	rp.z = arrayPos / (width*height);
+
+	return rp;
+}
 
 void RidgeTraversal::setTLow(float t_low) {
 	this->t_low = t_low;

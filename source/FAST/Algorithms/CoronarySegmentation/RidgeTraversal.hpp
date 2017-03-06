@@ -10,6 +10,21 @@
 
 namespace fast {
 
+typedef struct _ridge_neighbor{
+	float forward_pos;
+	float backward_pos;
+	float forward_direction;
+	float backward_direction;
+} ridge_neighbor;
+
+
+typedef struct _ridge_point {
+	int x;
+	int y;
+	int z;
+} ridge_point;
+
+
 class RidgeTraversal : public ProcessObject {
     FAST_OBJECT(RidgeTraversal);
     public:
@@ -26,6 +41,9 @@ class RidgeTraversal : public ProcessObject {
         void execute();
         float t_low;
         int l_min;
+
+        ridge_point createPointFromArrayPos(int arrayPos, int width, int height);
+
 };
 
 }

@@ -50,6 +50,7 @@ namespace fast {
 		void performOstiumDetection();
 		void performLungTissueRemoval();
 
+		void createTubeFromReference();
 
 
 	private:

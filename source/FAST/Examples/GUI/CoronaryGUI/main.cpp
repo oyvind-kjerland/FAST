@@ -58,6 +58,9 @@ int main(int argc, char* argv[]) {
 		("ridge-candidate-selection", "perform ridge candidate selection")
 		("ridge-traversal", "perform ridge traversal")
 		("tree-reconstruction", "perform tree reconstruction")
+
+		// Labeled data creation
+		("tube-from-reference", "Create binary volume tubes from reference centerlines")
 	;
 
 	po::variables_map vm;
@@ -139,6 +142,10 @@ int main(int argc, char* argv[]) {
 
 	if (vm.count("lung-tissue-removal")) {
 		window->performLungTissueRemoval();
+	}
+
+	if (vm.count("tube-from-reference")) {
+		window->createTubeFromReference();
 	}
 
 
