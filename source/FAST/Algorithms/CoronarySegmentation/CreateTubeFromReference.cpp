@@ -33,7 +33,7 @@ void CreateTubeFromReference::execute() {
     Vector3f spacing = referenceImage->getSpacing();
 
     mSpacing = spacing;
-
+    std::cout << "Width: " << width << " Height: " << height << " Depth: " << depth << std::endl;
     binaryVolume->create(
 			width,
 			height,
@@ -42,7 +42,7 @@ void CreateTubeFromReference::execute() {
 			1
 	);
     binaryVolume->setSpacing(spacing);
-
+    std::cout << "Binary volume initialized" << std::endl;
 
     std::vector<ref_point> pointList;
     readReferencePoints(pointList);
@@ -50,6 +50,9 @@ void CreateTubeFromReference::execute() {
     int num_points = pointList.size();
     std::cout << "pointList size: " << num_points << std::endl;
 
+    std::cout << "Num points: " << num_points << std::endl;
+
+    /*
     Image::pointer points = Image::New();
     points->create(
     		num_points,
@@ -58,35 +61,53 @@ void CreateTubeFromReference::execute() {
     		TYPE_FLOAT,
     		4
     );
+    */
 
     // Populate point image
-    ImageAccess::pointer pointsAccess = points->getImageAccess(ACCESS_READ_WRITE);
-    ref_point* pointsArray = (ref_point*)pointsAccess->get();
+    //ImageAccess::pointer pointsAccess = points->getImageAccess(ACCESS_READ_WRITE);
+    //ref_point* pointsArray = (ref_point*)pointsAccess->get();
 
+    ref_point *pointsArr = (ref_point*)malloc(sizeof(float)*num_points*4);
     for (int i=0; i<num_points; i++) {
-    	pointsArray[i] = pointList[i];
+    	pointsArr[i] = pointList[i];
     }
     
+    //memcpy(pointsArr, pointsArray, sizeof(float)*num_points*4);
+
     // Release access
-    pointsAccess->release();
+    //pointsAccess->release();
+
 
     if(getMainDevice()->isHost()) {
         throw Exception("Not implemented yet.");
     } else {
         OpenCLDevice::pointer device = OpenCLDevice::pointer(getMainDevice());
+
         cl::Program program = getOpenCLProgram(device, "", buildOptions);
         cl::Kernel kernel;
 
+        cl_int err;
+        //cl_mem points_buffer = clCreateBuffer(device->getContext(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(cl_float) * num_points * 4, pointList, &success);
+        //cl::Buffer points_buffer(device->getContext(), CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(cl_float)*num_points*4, pointsArr, &err);
+        cl::Buffer buffer(device->getContext(),CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(cl_float)*num_points*4, pointsArr);
+        device->getCommandQueue().enqueueReadBuffer(buffer, CL_TRUE, 0, sizeof(cl_float)*num_points*4, (void*)pointsArr);
 
-        OpenCLImageAccess::pointer pointsImageAccess = points->getOpenCLImageAccess(ACCESS_READ, device);
+        if (err != CL_SUCCESS) {
+            std::cerr << "ERROR: create buffer (" << err << ")" << std::endl;
+            exit(1);
+        }
+
+        //OpenCLImageAccess::pointer pointsImageAccess = points->getOpenCLImageAccess(ACCESS_READ, device);
         OpenCLBufferAccess::pointer binaryVolumeAccess = binaryVolume->getOpenCLBufferAccess(ACCESS_READ_WRITE, device);
 		kernel = cl::Kernel(program, "CreateTubeFromReference");
 		
 		int offset = 0;
 		int chunk_size = 32;
 
-		kernel.setArg(0, *pointsImageAccess->get3DImage());
+		kernel.setArg(0, buffer);
+		//kernel.setArg(0, *pointsImageAccess->get3DImage());
 		kernel.setArg(3, *binaryVolumeAccess->get());
+		//kernel.setArg(3, points_buffer);
 
 		// Perform iterative
 		while(1) {

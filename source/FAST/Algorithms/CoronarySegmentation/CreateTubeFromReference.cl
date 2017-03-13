@@ -2,9 +2,12 @@ __constant sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_T
 
 #define LPOS(pos) pos.x+pos.y*get_global_size(0)+pos.z*get_global_size(0)*get_global_size(1)
 
+typedef struct _ref_point {
+	float x, y, z, w;
+} ref_point;
 
 __kernel void CreateTubeFromReference(
-        __read_only image3d_t points,
+        __global ref_point* points,
         __private int offset,
         __private int length,
         __global float* binaryVolume
@@ -21,7 +24,8 @@ __kernel void CreateTubeFromReference(
 	
 	for (int i=offset; i<offset+length; i++) {
 		pointPos.x = i;
-		float4 point = read_imagef(points, sampler, pointPos).xyzw;
+		//float4 point = read_imagef(points, sampler, pointPos).xyzw;
+		ref_point point = points[i];
 		// calculate distance
 		d2 = pow(point.x - pos.x, 2) + pow(point.y - pos.y, 2) + pow(point.z - pos.z, 2);
 		if (d2 < pow(point.w,2)) label = 1;

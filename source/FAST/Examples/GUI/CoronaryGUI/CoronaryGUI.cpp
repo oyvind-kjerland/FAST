@@ -651,18 +651,31 @@ void CoronaryGUI::performRidgeTraversal()
 void CoronaryGUI::createTubeFromReference() {
 	std::cout << "Create tube from reference" << std::endl;
 	std::string referenceFilename = folderPath;
-	std::string outputfilename = folderPath + "tubeFromReference.mhd";
+	std::string outputFilename = folderPath + "tubeFromReference"+currentDataset+".mhd";
 
-	importImage(folderPath + "image02.mhd");
+	importImage(folderPath + "image" + currentDataset +".mhd");
 
-	CreateTubeFromReference::pointer tubeFromReference = CreateTubeFromReference::New();
-	tubeFromReference->setInputConnection(imageFileImporter->getOutputPort());
-	tubeFromReference->setFilename(referenceFilename);
-	tubeFromReference->update();
+	try {
 
-	slicePort = tubeFromReference->getOutputPort();
+		CreateTubeFromReference::pointer tubeFromReference = CreateTubeFromReference::New();
+		tubeFromReference->setInputConnection(imageFileImporter->getOutputPort());
+		tubeFromReference->setFilename(referenceFilename);
+		tubeFromReference->update();
+
+		if (useCache) {
+			metaImageExporter->setFilename(outputFilename);
+			metaImageExporter->setInputConnection(tubeFromReference->getOutputPort());
+			metaImageExporter->update();
+		}
+
+		slicePort = tubeFromReference->getOutputPort();
+
+	} catch (cl::Error err) {
+		std::cout << "CL error: " << err.err() << " " << err.what() << std::endl;
+	}
 
 
+	this->setTimeout(1000);
 
 }
 
